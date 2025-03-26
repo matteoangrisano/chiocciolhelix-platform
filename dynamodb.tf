@@ -9,8 +9,8 @@ resource "aws_dynamodb_table" "users" {
   }
 }
 
-resource "aws_dynamodb_table" "operators" {
-  name         = "operators"
+resource "aws_dynamodb_table" "products" {
+  name         = "products"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
@@ -20,19 +20,8 @@ resource "aws_dynamodb_table" "operators" {
   }
 }
 
-resource "aws_dynamodb_table" "services" {
-  name         = "services"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-}
-
-resource "aws_dynamodb_table" "appointments" {
-  name         = "appointments"
+resource "aws_dynamodb_table" "orders" {
+  name         = "orders"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
