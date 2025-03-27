@@ -8,15 +8,39 @@ resource "aws_cognito_user_pool" "users" {
   }
 
   verification_message_template {
-    default_email_option = "CONFIRM_WITH_LINK"
-    email_subject        = "Account registrato con successo"
-    email_message        = "Grazie per la registrazione. Il tuo account è in attesa di approvazione da parte dell'amministratore. {####}"
+    default_email_option = "CONFIRM_WITH_CODE"
+    email_subject        = "Codice di verifica per ChiocciolHelix"
+    email_message        = "Il tuo codice di verifica è: {####}"
   }
 
   account_recovery_setting {
     recovery_mechanism {
       name     = "verified_email"
       priority = 1
+    }
+  }
+
+  schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "given_name"
+    required                 = false
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 255
+    }
+  }
+
+  schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "family_name"
+    required                 = false
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 255
     }
   }
 
@@ -32,13 +56,19 @@ resource "aws_cognito_user_pool" "users" {
   mfa_configuration = "OFF"
 }
 
+# Configura un dominio per il pool utenti
+resource "aws_cognito_user_pool_domain" "main" {
+  domain       = "${local.workspace["project_name"]}-${terraform.workspace}-auth"
+  user_pool_id = aws_cognito_user_pool.users.id
+}
+
 resource "aws_cognito_user_pool_client" "users" {
   name         = "${local.workspace["project_name"]}-${terraform.workspace}-users"
   user_pool_id = aws_cognito_user_pool.users.id
 
   # Abilita l'inclusione dei gruppi nei token ID e Access
-  read_attributes  = ["email", "email_verified"]
-  write_attributes = ["email"]
+  read_attributes  = ["email", "email_verified", "given_name", "family_name"]
+  write_attributes = ["email", "given_name", "family_name"]
 }
 
 # Definizione del gruppo admin
